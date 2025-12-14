@@ -17,14 +17,15 @@ type Props = {
     title: string
     redirectHref: string
   }
+  children: React.ReactNode
 }
 
 const PlaygroundHandbook = (props: Props) => {
     return (
-        <div dangerouslySetInnerHTML={{ __html: props.pageContext.html! }} />
+        <div className="markdown">{props.children}</div>
   )
 }
 
 
-
-export default (props: Props) => <Intl locale={props.pageContext.lang}><PlaygroundHandbook {...props} /></Intl>
+const PlaygroundHandbookWrapper = (props: Props) => <Intl locale={props.pageContext.lang}><PlaygroundHandbook {...props} /></Intl>
+export default PlaygroundHandbookWrapper

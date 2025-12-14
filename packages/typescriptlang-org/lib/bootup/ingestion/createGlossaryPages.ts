@@ -21,6 +21,11 @@ export const createGlossaryPages = async (
           name
           modifiedTime
           absolutePath
+          childMdx {
+            internal {
+              contentFilePath
+            }
+          }
         }
       }
     }
@@ -46,10 +51,9 @@ export const createGlossaryPages = async (
 
     createPage({
       path: pagePath,
-      component: GlossaryTemplatePath,
+      component: `${GlossaryTemplatePath}?__contentFilePath=${element.childMdx.internal.contentFilePath}`,
       context: {
         locale: element.name,
-        glossaryPath: element.absolutePath,
         languageMeta: termsForLang,
       },
     })

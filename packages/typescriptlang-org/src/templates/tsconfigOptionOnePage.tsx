@@ -17,6 +17,7 @@ type Props = {
     title: string
     redirectHref: string
   }
+  children: React.ReactNode
 }
 
 const Play = (props: Props) => {
@@ -36,7 +37,7 @@ const Play = (props: Props) => {
         <h1 style={{ display: "none" }}>TSConfig</h1>
         <h2>{props.pageContext.title}</h2>
         <div style={{ maxWidth: "800px", margin: "0 auto", padding: "80px" }}>
-          <p dangerouslySetInnerHTML={{ __html: props.pageContext.html! }} />
+          <p>{props.children}</p>
         </div>
       </div>
     </Layout>
@@ -44,5 +45,5 @@ const Play = (props: Props) => {
 }
 
 
-
-export default (props: Props) => <Intl locale={props.pageContext.lang}><Play {...props} /></Intl>
+const PlayWrapper = (props: Props) => <Intl locale={props.pageContext.lang}><Play {...props} /></Intl>
+export default PlayWrapper

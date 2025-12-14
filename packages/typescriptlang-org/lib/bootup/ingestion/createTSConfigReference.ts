@@ -30,6 +30,11 @@ export const createTSConfigReference = async (
           name
           modifiedTime
           absolutePath
+          childMdx {
+            internal {
+              contentFilePath
+            }
+          }
         }
       }
     }
@@ -68,10 +73,9 @@ export const createTSConfigReference = async (
 
     createPage({
       path: pagePath,
-      component: tsConfigRefPage,
+      component: `${tsConfigRefPage}?__contentFilePath=${element.childMdx.internal.contentFilePath}`,
       context: {
         locale: element.name,
-        tsconfigMDPath: element.absolutePath,
         intro: {
           html: introHTML,
           header: intro.data.header,

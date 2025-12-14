@@ -21,8 +21,10 @@ export const createPlaygroundHandbookPages = async (
           id
           name
           absolutePath
-          childMarkdownRemark {
-            html
+          childMdx {
+            internal {
+              contentFilePath
+            }
           }
         }
       }
@@ -58,11 +60,10 @@ export const createPlaygroundHandbookPages = async (
     const url = `/_playground-handbook/${id}`
     createPage({
       path: url + ".html",
-      component: path.resolve(`./src/templates/playgroundHandbook.tsx`),
+      component: `${path.resolve(`./src/templates/playgroundHandbook.tsx`)}?__contentFilePath=${option.childMdx.internal.contentFilePath}`,
       context: {
         title: option.name,
         lang: "en",
-        html: option.childMarkdownRemark.html,
       },
     })
   })

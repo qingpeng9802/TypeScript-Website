@@ -11,12 +11,12 @@ import { headCopy } from "../copy/en/head-seo"
 import "./markdown.scss"
 import "./glossary.scss"
 
-type Props = { pageContext: any, data: GatsbyTypes.TSConfigReferenceTemplateQuery, path: string }
+type Props = { pageContext: any, data: GatsbyTypes.TSConfigReferenceTemplateQuery, path: string, children: React.ReactNode }
 
-const GlossaryTemplateComponent = (props) => {
+const GlossaryTemplateComponent = (props: Props) => {
   const i = createInternational<typeof headCopy>(useIntl())
 
-  const post = props.data.markdownRemark
+  const post = props.data.mdx
   if (!post) {
     console.log("Could not render:", JSON.stringify(props))
     return <div></div>
@@ -33,22 +33,11 @@ const GlossaryTemplateComponent = (props) => {
             meta.terms.map(t => <li key={t.id}><a href={"#" + t.id}>{t.display}</a></li>)
           }
         </ul>
-        <div dangerouslySetInnerHTML={{ __html: post.html! }} />
+        <div className="markdown">{props.children}</div>
       </div>
     </Layout>
   )
 }
 
-export const pageQuery = graphql`
-  query GlossaryTemplate($glossaryPath: String!) {
-    markdownRemark(fileAbsolutePath: {eq: $glossaryPath} ) {
-      id
-      html
-      frontmatter {
-        permalink
-      }
-    }
-  }
-`
-
-export default (props: Props) => <Intl locale={props.pageContext.locale}><GlossaryTemplateComponent {...props} /></Intl>
+const GlossaryWrapper = (props: Props) => <Intl locale={props.pageContext.locale}><GlossaryTemplateComponent {...props} /></Intl>
+export default GlossaryWrapper

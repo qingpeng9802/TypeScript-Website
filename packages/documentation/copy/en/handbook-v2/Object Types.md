@@ -344,7 +344,7 @@ Where and how an object is assigned a type can make a difference in the type sys
 One of the key examples of this is in excess property checking, which validates the object more thoroughly when it is created and assigned to an object type during creation.
 
 ```ts twoslash
-// @errors: 2345 2739
+// @errors: 2561
 interface SquareConfig {
   color?: string;
   width?: number;

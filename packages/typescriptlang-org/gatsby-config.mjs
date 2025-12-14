@@ -1,3 +1,12 @@
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+import { createRequire } from 'module'
+import rehypeShiki from '@shikijs/rehype'
+import { transformerTwoslash } from '@shikijs/twoslash'
+
+const require = createRequire(import.meta.url)
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 if (process.env.BOOTSTRAPPING) {
   const chalk = require("chalk")
   const readline = require("readline")
@@ -14,15 +23,16 @@ if (process.env.BOOTSTRAPPING) {
 
 require("./scripts/ensureDepsAreBuilt")
 
-const ts = require("typescript");
-
 // https://github.com/gatsbyjs/gatsby/issues/1457
 require("ts-node").register({ files: true })
-const { join } = require("path")
 
-module.exports = {
+export default {
   siteMetadata: {
     siteUrl: `https://www.typescriptlang.org/`,
+  },
+  graphqlTypegen: {
+    // Ensure it works in a monorepo
+    typesOutputPath: `${__dirname}/src/__generated__/gatsby-types.ts`,
   },
   flags: {
     DEV_SSR: false,
@@ -52,17 +62,6 @@ module.exports = {
     // Support for downloading or pre-caching pages, needed for PWAs
     // "gatsby-plugin-offline",
 
-    // Creates TS types for queries during `gatsby dev`
-    {
-      resolve: "gatsby-plugin-typegen",
-      options: {
-        // Ensure it works in a monorepo
-        outputPath: __dirname + "/src/__generated__/gatsby-types.ts",
-      },
-    },
-
-    // Support ts/tsx files in src
-    "gatsby-plugin-typescript",
     // SEO
     {
       resolve: `gatsby-plugin-sitemap`,
@@ -134,11 +133,11 @@ module.exports = {
     },
 
     // Markdown support, and markdown + react
-    // `gatsby-plugin-mdx`,
     {
-      resolve: `gatsby-transformer-remark`,
+      resolve: `gatsby-plugin-mdx`,
       options: {
-        plugins: [
+        extensions: [`.md`, `.mdx`],
+        gatsbyRemarkPlugins: [
           {
             resolve: `gatsby-remark-images`,
             options: {
@@ -152,23 +151,32 @@ module.exports = {
             },
           },
           "gatsby-remark-autolink-headers",
-          {
-            resolve: "gatsby-remark-shiki-twoslash",
-            options: {
-              theme: require("./lib/themes/typescript-beta-light.json"),
-              addTryButton: true,
-              defaultOptions: {
-                noErrorValidation: true,
-              },
-              defaultCompilerOptions: {
-                types: [],
-                target: ts.ScriptTarget.ES2020,
-              },
-            },
-          },
           "gatsby-remark-copy-linked-files",
           "gatsby-remark-smartypants",
         ],
+        mdxOptions: {
+          format: 'md',
+          rehypePlugins: [
+            [
+              rehypeShiki,
+              {
+                themes: {
+                  light: 'light-plus',
+                  dark: 'dark-plus',
+                },
+                transformers: [transformerTwoslash({explicitTrigger: true})],
+              },
+            ],
+          ],
+        },
+      },
+    },
+    // avoid mdx trying to create pages for `/src/pages/README.md`
+    {
+      resolve: `gatsby-plugin-page-creator`,
+      options: {
+        path: `${__dirname}/src/pages`,
+        ignore: [`**/README.md`], 
       },
     },
     // Finds auto-generated <a>s and converts them

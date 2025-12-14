@@ -1,0 +1,16 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index 3d2146283e4dbdcb4b9fcd32c450f367c249519d..0000000000000000000000000000000000000000
+diff --git a/dist/compile-mdx.js b/dist/compile-mdx.js
+index 44338f31c8779fbb8ef4b8b718b04273dee3f56d..373fae7ca76f88a2d45c393d2c196dac095d7a14 100644
+--- a/dist/compile-mdx.js
++++ b/dist/compile-mdx.js
+@@ -45,7 +45,7 @@ async function compileMDX({
+       metadata: clonedMetadata
+     };
+   } catch (error) {
+-    reporter.panicOnBuild({
++    reporter.error({
+       id: _errorUtils.ERROR_CODES.MdxCompilation,
+       context: {
+         absolutePath,

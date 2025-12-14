@@ -26,12 +26,13 @@ type Props = {
   },
   data: GatsbyTypes.TSConfigReferenceTemplateQuery,
   path: string
+  children: React.ReactNode
 }
 
 const TSConfigReferenceTemplateComponent = (props: Props) => {
   const i = createInternational<typeof headCopy>(useIntl())
 
-  const post = props.data.markdownRemark
+  const post = props.data.mdx
   if (!post) {
     console.log("Could not render:", JSON.stringify(props))
     return <div></div>
@@ -188,7 +189,7 @@ const TSConfigReferenceTemplateComponent = (props: Props) => {
           {!openInfo && <div className="preview">{props.pageContext.intro.preview}</div>}
         </a>
 
-        {openInfo && <div className="content">  <div dangerouslySetInnerHTML={{ __html: props.pageContext.intro.html }} /></div>}
+        {openInfo && <div className="content">  <div>{props.pageContext.intro.html}</div></div>}
       </div>
 
       <div className="tsconfig main-content-block">
@@ -200,25 +201,11 @@ const TSConfigReferenceTemplateComponent = (props: Props) => {
       </div>
 
 
-      <div dangerouslySetInnerHTML={{ __html: post.html! }} />
+      <div className="markdown">{props.children}</div>
 
     </Layout >
   )
 }
 
-
-export const pageQuery = graphql`
-query TSConfigReferenceTemplate($tsconfigMDPath: String!) {
-
-  markdownRemark(fileAbsolutePath: {eq: $tsconfigMDPath} ) {
-    id
-    html
-    frontmatter {
-      permalink
-    }
-  }
-}
-`
-
-
-export default (props: Props) => <Intl locale={props.pageContext.locale}><TSConfigReferenceTemplateComponent {...props} /></Intl>
+const TSConfigRefWrapper = (props: Props) => <Intl locale={props.pageContext.locale}><TSConfigReferenceTemplateComponent {...props} /></Intl>
+export default TSConfigRefWrapper

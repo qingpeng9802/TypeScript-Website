@@ -2,12 +2,13 @@
 export const invertCodeToHTML = (code: string) => {
   const newlines = [] as string[]
 
-  enum State {
-    InComment,
-    InCode,
-  }
+  const State = {
+    InComment: "InComment",
+    InCode: "InCode",
+  } as const
+  type State = typeof State[keyof typeof State];
 
-  let state = State.InComment
+  let state: State = State.InComment
 
   const oldLines = code.split("\n")
   oldLines.forEach((line, index) => {
@@ -49,5 +50,10 @@ export const invertCodeToHTML = (code: string) => {
 
     newlines.push(line)
   })
+
+  if ((state as State) === State.InCode) {
+    newlines.push("</pre></code>")
+  }
+
   return newlines.join("\n")
 }

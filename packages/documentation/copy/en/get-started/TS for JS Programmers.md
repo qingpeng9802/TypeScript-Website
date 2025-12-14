@@ -67,7 +67,7 @@ const user: User = {
 If you provide an object that doesn't match the interface you have provided, TypeScript will warn you:
 
 ```ts twoslash
-// @errors: 2322
+// @errors: 2353
 interface User {
   name: string;
   id: number;

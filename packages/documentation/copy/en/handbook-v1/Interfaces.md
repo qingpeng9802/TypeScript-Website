@@ -170,7 +170,7 @@ We also just learned about optional properties, and how they're useful when desc
 However, combining the two naively would allow an error to sneak in. For example, taking our last example using `createSquare`:
 
 ```ts twoslash
-// @errors: 2345 2739
+// @errors: 2345 2739 2561
 interface SquareConfig {
   color?: string;
   width?: number;
@@ -196,7 +196,7 @@ Object literals get special treatment and undergo _excess property checking_ whe
 If an object literal has any properties that the "target type" doesn't have, you'll get an error:
 
 ```ts twoslash
-// @errors: 2345 2739
+// @errors: 2345 2739 2561
 interface SquareConfig {
   color?: string;
   width?: number;

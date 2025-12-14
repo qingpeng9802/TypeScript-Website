@@ -32,9 +32,12 @@ export const createDocumentationPages = async (
           modifiedTime
           absolutePath
 
-          childMarkdownRemark {
+          childMdx {
             frontmatter {
               permalink
+            }
+            internal {
+              contentFilePath
             }
           }
         }
@@ -66,7 +69,7 @@ export const createDocumentationPages = async (
   }
 
   docs.forEach((post: any) => {
-    const permalink = post.childMarkdownRemark.frontmatter.permalink
+    const permalink = post.childMdx.frontmatter.permalink
     if (!permalink)
       // prettier-ignore
       throw new Error(`Did not find a permalink for page: ${JSON.stringify(post)}`)
@@ -90,7 +93,7 @@ export const createDocumentationPages = async (
       if (previousPath) {
         const path = getPreviousPageID(handbookNav, id)!.path
         // prettier-ignore
-        const previousDoc = docs.find((d) => d.childMarkdownRemark.frontmatter.permalink === path)
+        const previousDoc = docs.find((d) => d.childMdx.frontmatter.permalink === path)
         if (previousDoc) previousID = previousDoc.id
       }
 
@@ -98,7 +101,7 @@ export const createDocumentationPages = async (
       if (nextPath) {
         const path = getNextPageID(handbookNav, id)!.path
         // prettier-ignore
-        const nextDoc = docs.find((d) => d.childMarkdownRemark.frontmatter.permalink === path)
+        const nextDoc = docs.find((d) => d.childMdx.frontmatter.permalink === path)
         if (nextDoc) nextID = nextDoc.id
       }
     }
@@ -106,13 +109,13 @@ export const createDocumentationPages = async (
     const repoRoot = path.join(process.cwd(), "..", "..")
     const repoPath = post.absolutePath.replace(repoRoot, "")
 
-    if (post.childMarkdownRemark) {
-      const path = post.childMarkdownRemark.frontmatter.permalink
+    if (post.childMdx) {
+      const path = post.childMdx.frontmatter.permalink
       addPathToSite(path)
 
       createPage({
         path,
-        component: handbookPage,
+        component: `${handbookPage}?__contentFilePath=${post.childMdx.internal.contentFilePath}`,
         context: {
           id: id,
           slug: path,

@@ -22,8 +22,10 @@ export const createTSConfigSingleFlagPages = async (
           id
           name
           absolutePath
-          childMarkdownRemark {
-            html
+          childMdx {
+            internal {
+              contentFilePath
+            }
           }
         }
       }
@@ -50,11 +52,10 @@ export const createTSConfigSingleFlagPages = async (
 
     createPage({
       path: url + ".html",
-      component: playPage,
+      component: `${playPage}?__contentFilePath=${option.childMdx.internal.contentFilePath}`,
       context: {
         title: option.name,
         lang: "en",
-        html: option.childMarkdownRemark.html,
         redirectHref: `/tsconfig#${option.name}`,
       },
     })

@@ -147,7 +147,7 @@ uncalled functions,
 
 ```ts twoslash
 // @noUnusedLocals
-// @errors: 2365
+// @errors: 2365 6133
 function flipCoin() {
   // Meant to be Math.random()
   return Math.random < 0.5;

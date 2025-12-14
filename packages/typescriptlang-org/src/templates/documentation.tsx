@@ -35,10 +35,11 @@ type Props = {
   }
   data: GatsbyTypes.GetDocumentBySlugQuery
   path: string
+  children: React.ReactNode
 }
 
 const HandbookTemplate: React.FC<Props> = (props) => {
-  const post = props.data.markdownRemark
+  const post = props.data.mdx
   if (!post) {
     console.log("Could not render:", JSON.stringify(props))
     return <div></div>
@@ -75,10 +76,9 @@ const HandbookTemplate: React.FC<Props> = (props) => {
 
 
   if (!post.frontmatter) throw new Error(`No front-matter found for the file with props: ${props}`)
-  if (!post.html) throw new Error(`No html found for the file with props: ${props}`)
 
   const selectedID = props.pageContext.id || "NO-ID"
-  const sidebarHeaders = post.headings?.filter(h => (h?.depth || 0) <= 3) || []
+  const sidebarHeaders = post.tableOfContents?.items || [];
   const showSidebar = !post.frontmatter.disable_toc
   const showExperimental = post.frontmatter.experimental
   const navigation = getDocumentationNavForLanguage(props.pageContext.lang)
@@ -151,14 +151,14 @@ const HandbookTemplate: React.FC<Props> = (props) => {
           {post.frontmatter.preamble && <div className="preamble" dangerouslySetInnerHTML={{ __html: post.frontmatter.preamble }} />}
           <article>
             <div className="whitespace raised">
-              <div className="markdown" dangerouslySetInnerHTML={{ __html: post.html! }} />
+              <div className="markdown">{props.children}</div>
             </div>
             {showSidebar &&
               <aside className="handbook-toc">
                 <nav className={deprecationURL ? "deprecated" : ""} aria-label="table of contents">
                   {<>
                     <h5>{i("handb_on_this_page")}</h5>
-                    <MarkdownHeadingTree tree={headerListToTree(sidebarHeaders)} className="handbook-on-this-page-section-list" slug={slug} />
+                    <MarkdownHeadingTree tree={mapMdxToTree(sidebarHeaders)} className="handbook-on-this-page-section-list" slug={slug} />
                   </>
                   }
                   <div id="like-dislike-subnav">
@@ -183,51 +183,28 @@ const HandbookTemplate: React.FC<Props> = (props) => {
 }
 
 type MarkdownHeadingTreeNode = {
+  url: string
   value: string
-  depth: number
   children?: MarkdownHeadingTreeNode[]
 }
 
-function headerListToTree(sidebarHeaders: GatsbyTypes.Maybe<Pick<GatsbyTypes.MarkdownHeading, "value" | "depth">>[]) {
-  const tree: MarkdownHeadingTreeNode[] = []
-  const stack: { node: MarkdownHeadingTreeNode; depth: number }[] = []
-
-  sidebarHeaders.forEach(header => {
-    const value = header?.value!;
-    const depth = header?.depth!;
-    const newNode: MarkdownHeadingTreeNode = {
-      value,
-      depth
-    }
-
-    while (stack.length > 0 && stack[stack.length - 1].depth >= depth) {
-      stack.pop()
-    }
-
-    if (stack.length === 0) {
-      tree.push(newNode)
-    } else {
-      const topNode = stack[stack.length - 1].node;
-      if (!topNode.children) {
-        topNode.children = [];
-      }
-      topNode.children.push(newNode);
-    }
-
-    stack.push({ node: newNode, depth })
-  })
-
-  return tree
+function mapMdxToTree(items: any[]): MarkdownHeadingTreeNode[] {
+  return items.map(item => ({
+    value: item.title,
+    url: item.url,
+    children: item.items ? mapMdxToTree(item.items) : undefined
+  }));
 }
 
 function MarkdownHeadingTree(props: { tree: MarkdownHeadingTreeNode[], slug: typeof slugger, className?: string }) {
   return <ul className={props.className}>
       {
-        props.tree.map(heading => {
+        props.tree.map((heading, index) => {
+          const href = heading.url || `#${index}`;
           const id = props.slug.slug(heading.value, false)
           return (
             <li key={id}>
-              <a href={'#' + id}>{heading.value}</a>
+              <a href={href}>{heading.value}</a>
               {heading.children?.length ? <MarkdownHeadingTree tree={heading.children} slug={props.slug} /> : null}
             </li>
           )
@@ -236,18 +213,15 @@ function MarkdownHeadingTree(props: { tree: MarkdownHeadingTreeNode[], slug: typ
     </ul>
 }
 
-export default (props: Props) => <Intl locale={props.pageContext.lang}><HandbookTemplate {...props} /></Intl>
+const DocumentationWrapper = (props: Props) => <Intl locale={props.pageContext.lang}><HandbookTemplate {...props} /></Intl>
+export default DocumentationWrapper
 
 export const pageQuery = graphql`
   query GetDocumentBySlug($slug: String!, $previousID: String, $nextID: String) {    
-    markdownRemark(frontmatter: { permalink: {eq: $slug}}) {
+    mdx(frontmatter: { permalink: {eq: $slug}}) {
       id
       excerpt(pruneLength: 160)
-      html
-      headings {
-        value
-        depth
-      }
+      tableOfContents(maxDepth: 3)
       frontmatter {
         permalink
         title
@@ -262,7 +236,7 @@ export const pageQuery = graphql`
     }
 
     prev: file(id: { eq: $previousID } ) {
-      childMarkdownRemark  {
+      childMdx  {
         frontmatter {
           title
           oneline
@@ -272,7 +246,7 @@ export const pageQuery = graphql`
     }
 
     next: file(id: { eq: $nextID } ) {
-      childMarkdownRemark  {
+      childMdx  {
         frontmatter {
           title
           oneline
