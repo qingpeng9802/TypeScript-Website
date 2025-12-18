@@ -4,6 +4,7 @@ const {
   addPathToSite,
   writeAllPathsToFixture,
 } = require("./lib/bootup/pathsOnSiteTracker");
+const path = require('path');
 
 /** @type { import("gatsby").GatsbyNode } */
 const config = {};
@@ -20,6 +21,16 @@ config.onPostBootstrap = () => writeAllPathsToFixture();
 
 config.onCreateWebpackConfig = ({ loaders, actions, plugins, stage }) => {
   actions.setWebpackConfig({
+    devtool: false,
+    cache: {
+      type: 'filesystem',
+      cacheDirectory: path.resolve(__dirname, '.custom_webpack_cache'),
+      allowCollectingMemory: true,
+      maxMemoryGenerations: 0,
+      buildDependencies: {
+        config: [__filename],
+      },
+    },
     module: {
       rules: [
         {
@@ -44,12 +55,7 @@ config.onCreateWebpackConfig = ({ loaders, actions, plugins, stage }) => {
       },
     },
 
-    plugins: [
-      plugins.define({
-        __DEVELOPMENT__: stage === `develop` || stage === `develop-html`,
-      }),
-      new NodePolyfillPlugin(),
-    ],
+    
   });
 };
 

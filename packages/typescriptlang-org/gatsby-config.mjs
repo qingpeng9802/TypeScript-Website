@@ -35,7 +35,7 @@ export default {
     typesOutputPath: `${__dirname}/src/__generated__/gatsby-types.ts`,
   },
   flags: {
-    DEV_SSR: false,
+    DEV_SSR: true,
   },
   plugins: [
     // SCSS provides inheritance for CSS and which pays the price for the dep
@@ -179,6 +179,9 @@ export default {
         ignore: [`**/README.md`], 
       },
     },
+    `gatsby-plugin-perf-budgets`,
+    `gatsby-plugin-webpack-bundle-analyser-v2`,
+    "gatsby-plugin-no-sourcemaps",
     // Finds auto-generated <a>s and converts them
     // into Gatsby Links at build time, speeding up
     // linking between pages.
