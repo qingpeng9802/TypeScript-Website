@@ -1,0 +1,6 @@
+{
+  "createPages": "[Function: createPages]",
+  "onCreatePage": "[Function: anonymous]",
+  "onPostBootstrap": "[Function: anonymous]",
+  "onCreateWebpackConfig": "[Function: anonymous]"
+}
