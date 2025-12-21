@@ -6,7 +6,7 @@ oneline: "Disable reporting of excess property errors during the creation of obj
 This disables reporting of excess property errors, such as the one shown in the following example:
 
 ```ts twoslash
-// @errors: 2322
+// @errors: 2322 2353
 type Point = { x: number; y: number };
 const p: Point = { x: 1, y: 3, m: 10 };
 ```

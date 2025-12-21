@@ -9,7 +9,7 @@ generating a type for the `import` based on the static JSON shape.
 TypeScript does not support resolving JSON files by default:
 
 ```ts twoslash
-// @errors: 2732
+// @errors: 2732 2307
 // @filename: settings.json
 {
     "repo": "TypeScript",
