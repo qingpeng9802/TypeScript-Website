@@ -1,6 +1,5 @@
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
-import remarkStringify from 'remark-stringify';
 import gatsbyPlugin from './plugins/gatsby-remark-shiki/index.mjs';
 
 // The E2E Simulation Function
