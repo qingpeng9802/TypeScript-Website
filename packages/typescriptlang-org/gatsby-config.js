@@ -152,18 +152,7 @@ module.exports = {
           },
           "gatsby-remark-autolink-headers",
           {
-            resolve: "gatsby-remark-shiki-twoslash",
-            options: {
-              theme: require("./lib/themes/typescript-beta-light.json"),
-              addTryButton: true,
-              defaultOptions: {
-                noErrorValidation: true,
-              },
-              defaultCompilerOptions: {
-                types: [],
-                target: ts.ScriptTarget.ES2020,
-              },
-            },
+            resolve: path.resolve(`${__dirname}/../tsconfig-reference/copy/en/options`)
           },
           "gatsby-remark-copy-linked-files",
           "gatsby-remark-smartypants",

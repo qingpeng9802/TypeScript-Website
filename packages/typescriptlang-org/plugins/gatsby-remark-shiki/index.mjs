@@ -4,7 +4,7 @@ import { toHtml } from 'hast-util-to-html';
 import { unified } from 'unified';
 import rehypeShiki from '@shikijs/rehype';
 import { transformerTwoslash } from '@shikijs/twoslash'
-
+console.log('cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc')
 /**
  * @typedef {import('mdast').Root} MdastRoot
  * @typedef {import('mdast').Code} MdastCode
@@ -46,7 +46,7 @@ async function applyTwoslash({ markdownAST }) {
 
       /** @type {HastRoot} */
       const rootHast = { type: 'root', children: [hast] };
-      const transformedHast = await processor.run(rootHast));
+      const transformedHast = await processor.run(rootHast);
 
       node.type = 'html';
       node.value = toHtml(transformedHast);
