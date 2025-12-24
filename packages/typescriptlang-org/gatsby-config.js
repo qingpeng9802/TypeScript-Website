@@ -18,7 +18,6 @@ const ts = require("typescript");
 
 // https://github.com/gatsbyjs/gatsby/issues/1457
 require("ts-node").register({ files: true })
-const { join } = require("path")
 
 module.exports = {
   siteMetadata: {
