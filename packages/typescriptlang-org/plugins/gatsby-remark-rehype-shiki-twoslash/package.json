@@ -1,0 +1,27 @@
+{
+  "name": "gatsby-remark-rehype-shiki-twoslash",
+  "version": "1.0.0",
+  "description": "Gatsby remark plugin for Shiki and Twoslash by rehype brige",
+  "type": "module",
+  "main": "index.mjs",
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin",
+    "remark",
+    "rehype",
+    "shiki",
+    "twoslash"
+  ],
+  "peerDependencies": {
+    "gatsby": "^5.13.5"
+  },
+  "dependencies": {
+    "@shikijs/rehype": "^3.20.0",
+    "@shikijs/twoslash": "^3.20.0",
+    "hast-util-to-html": "^9.0.5",
+    "mdast-util-to-hast": "^13.2.1",
+    "p-limit": "^7.2.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0"
+  }
+}

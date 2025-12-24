@@ -4,32 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  remark-shiki-twoslash>@typescript/twoslash: link:./packages/ts-twoslasher
-  remark-shiki-twoslash>@typescript/vfs: link:./packages/typescript-vfs
-  shiki-twoslash>@typescript/twoslash: link:./packages/ts-twoslasher
-  shiki-twoslash>@typescript/vfs: link:./packages/typescript-vfs
-  '@types/react': ^18.2.77
-  '@types/estree': 0.0.46
-  '@types/eslint': 7.29.0
-  assert: 2.0.0
-  rollup-plugin-typescript2: 0.34.1
-  typescript: 5.9.2
-  tslib: ^2.6.2
-  prettier: ^2.0.2
-  sharp: 0.28.1
-
-patchedDependencies:
-  gatsby-remark-shiki-twoslash@3.0.38:
-    hash: prtace25mhevaarvvizifk2ksu
-    path: patches/gatsby-remark-shiki-twoslash@3.0.38.patch
-  react-intl@3.12.1:
-    hash: yqkzm4v5lxjbatodvsvpq7o7bq
-    path: patches/react-intl@3.12.1.patch
-  react-server-dom-webpack@0.0.0-experimental-c8b778b7f-20220825:
-    hash: mr727qw45duqihwv4trgafh5ci
-    path: patches/react-server-dom-webpack@0.0.0-experimental-c8b778b7f-20220825.patch
-
 importers:
 
   .:
@@ -520,6 +494,30 @@ importers:
       xmldom:
         specifier: ^0.5.0
         version: 0.5.0
+
+  packages/typescriptlang-org/plugins/gatsby-remark-rehype-shiki-twoslash:
+    dependencies:
+      '@shikijs/rehype':
+        specifier: ^3.20.0
+        version: 3.20.0
+      '@shikijs/twoslash':
+        specifier: ^3.20.0
+        version: 3.20.0(typescript@5.9.2)
+      hast-util-to-html:
+        specifier: ^9.0.5
+        version: 9.0.5
+      mdast-util-to-hast:
+        specifier: ^13.2.1
+        version: 13.2.1
+      p-limit:
+        specifier: ^7.2.0
+        version: 7.2.0
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
 
 packages:
 
@@ -2447,7 +2445,7 @@ packages:
   '@shikijs/twoslash@3.20.0':
     resolution: {integrity: sha512-fZz6vB9a0M8iuVF/ydIV4ToC09sbOh/TqxXZFWAh5J8bLiPsyQGtygKMDQ9L0Sdop3co0TIC/JsrLmsbmZwwsw==}
     peerDependencies:
-      typescript: 5.9.2
+      typescript: '>=5.5.0'
 
   '@shikijs/types@3.20.0':
     resolution: {integrity: sha512-lhYAATn10nkZcBQ0BlzSbJA3wcmL5MXUUF8d2Zzon6saZDlToKaiRX60n2+ZaHJCmXEcZRWNzn+k9vplr8Jhsw==}
@@ -2845,7 +2843,7 @@ packages:
   '@typescript/vfs@1.6.2':
     resolution: {integrity: sha512-hoBwJwcbKHmvd2QVebiytN1aELvpk9B74B4L1mFm/XT1Q/VOYAWl2vQ9AWRFtQq8zmz6enTpfTV8WRc4ATjW/g==}
     peerDependencies:
-      typescript: 5.9.2
+      typescript: '*'
 
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
@@ -8020,6 +8018,10 @@ packages:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
     engines: {node: '>=10'}
 
+  p-limit@7.2.0:
+    resolution: {integrity: sha512-ATHLtwoTNDloHRFFxFJdHnG6n2WUeFjaR8XQMFdKIv0xkXjrER8/iG9iu265jOM95zXHAfv9oTkqhrfbIzosrQ==}
+    engines: {node: '>=20'}
+
   p-locate@2.0.0:
     resolution: {integrity: sha512-nQja7m7gSKuewoVRen45CtVfODR3crN3goVQ0DDZ9N3yHxgpkuBhZqsaiotSQRrADUrne346peY7kT3TSACykg==}
     engines: {node: '>=4'}
@@ -10018,7 +10020,7 @@ packages:
   twoslash@0.3.6:
     resolution: {integrity: sha512-VuI5OKl+MaUO9UIW3rXKoPgHI3X40ZgB/j12VY6h98Ae1mCBihjPvhOPeJWlxCYcmSbmeZt5ZKkK0dsVtp+6pA==}
     peerDependencies:
-      typescript: 5.9.2
+      typescript: ^5.5.0
 
   type-check@0.3.2:
     resolution: {integrity: sha512-ZCmOJdvOWDBYJlzAoFkC+Q0+bUyEOS1ltgp1MGU03fqHG+dbi9tBFU2Rd9QKiDZFAYrhPh2JUf7rZRIuHRKtOg==}
@@ -10753,6 +10755,10 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  yocto-queue@1.2.2:
+    resolution: {integrity: sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==}
+    engines: {node: '>=12.20'}
 
   yoga-layout-prebuilt@1.10.0:
     resolution: {integrity: sha512-YnOmtSbv4MTf7RGJMK0FvZ+KD8OEe/J5BNnR0GHhD8J/XcG/Qvxgszm0Un6FTHWW4uHlTgP0IztiXQnGyIR45g==}
@@ -20919,6 +20925,10 @@ snapshots:
     dependencies:
       yocto-queue: 0.1.0
 
+  p-limit@7.2.0:
+    dependencies:
+      yocto-queue: 1.2.2
+
   p-locate@2.0.0:
     dependencies:
       p-limit: 1.3.0
@@ -24097,6 +24107,8 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
+
+  yocto-queue@1.2.2: {}
 
   yoga-layout-prebuilt@1.10.0:
     dependencies:

@@ -11,10 +11,8 @@ if (process.env.BOOTSTRAPPING) {
   Bootstrapped. You can now run the site with ${chalk.greenBright.bold("pnpm start")}.`)
   process.exit(0)
 }
-
+const path = require("path")
 require("./scripts/ensureDepsAreBuilt")
-
-const ts = require("typescript");
 
 // https://github.com/gatsbyjs/gatsby/issues/1457
 require("ts-node").register({ files: true })
@@ -151,9 +149,7 @@ module.exports = {
             },
           },
           "gatsby-remark-autolink-headers",
-          {
-            resolve: path.resolve(`${__dirname}/../tsconfig-reference/copy/en/options`)
-          },
+          "gatsby-remark-rehype-shiki-twoslash",
           "gatsby-remark-copy-linked-files",
           "gatsby-remark-smartypants",
         ],
