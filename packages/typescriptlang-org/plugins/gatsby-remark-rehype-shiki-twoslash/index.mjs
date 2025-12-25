@@ -7,6 +7,7 @@ import { transformerTwoslash } from '@shikijs/twoslash'
 import pLimit from 'p-limit';
 import fs from 'node:fs';
 import v8 from 'node:v8';
+import { pipeline } from 'node:stream/promises';
 
 import path from 'node:path';
 
@@ -51,18 +52,7 @@ const createprocessor = () => unified().use(rehypeShiki, {
           skipLibCheck: true,
         }
       },
-      typesCache: {
-        read: (code) => twoslashCache.get(code),
-        write: (code, twoslash) => {
-          // Logic to prevent the cache from exploding
-          if (twoslashCache.size > 5) {
-            twoslashCache.clear();
-            if (global.gc) global.gc();
-            console.log("♻️ Types Cache Cleared");
-          }
-          twoslashCache.set(code, twoslash);
-        }
-      }
+      cache: false
     })
   ],
 });
@@ -74,13 +64,25 @@ function logMemory(step) {
   const used = process.memoryUsage().heapUsed / 1024 / 1024;
   console.log(`[MEM] ${step}: ${Math.round(used)} MB`);
 }
+
+async function takeSnapshot(filename) {
+  const snapshotStream = v8.getHeapSnapshot();
+  const fileStream = fs.createWriteStream(filename);
+  
+  // pipeline handles errors and waits for the stream to finish
+  await pipeline(snapshotStream, fileStream);
+  
+  console.log(`Snapshot saved to ${filename}`);
+}
 const processor = createprocessor();
 let globalLock = Promise.resolve();
 /** 
  * @param {{ markdownAST: MdastRoot }} args
  * @returns {Promise<MdastRoot>}
  */
+let globalIndex = 0;
 async function applyTwoslash({ markdownAST }) {
+  
   return globalLock = globalLock.then(async () => {
 
     /** @type {import('unified').Processor<HastRoot, HastRoot, HastRoot, HastRoot, string>} */
@@ -95,7 +97,7 @@ async function applyTwoslash({ markdownAST }) {
 
     for (let index = 0; index < nodesToProcess.length; index++) {
       const node = nodesToProcess[index];
-
+      
 
       console.log(`mmm  ${twoslashCache.size}`)
       logMemory(`Before Node ${index}`);
@@ -114,19 +116,20 @@ async function applyTwoslash({ markdownAST }) {
       node.type = 'html';
       node.value = toHtml(transformedHast);
 
+      //global.gc();
       logMemory(`After Node ${index}`);
       if (twoslashCache.size > 50) {
         twoslashCache.clear();
         console.log('♻️ Twoslash cache cleared to prevent OOM');
       }
 
-      if (index === 0 || index === 1) {
-        if (global.gc) {
-          console.log('🧹 Running manual Garbage Collection...');
-          global.gc();
-        } else {
-          console.warn('⚠️ Garbage collection not exposed. Run with --expose-gc');
-        }
+      if (globalIndex === 1 || globalIndex === 5) {
+        //if (global.gc) {
+        //  console.log('🧹 Running manual Garbage Collection...');
+        //  global.gc();
+        //} else {
+        //  console.warn('⚠️ Garbage collection not exposed. Run with --expose-gc');
+        //}
         const reportDir = path.join(process.cwd(), 'reports');
 
         if (!fs.existsSync(reportDir)) {
@@ -134,12 +137,18 @@ async function applyTwoslash({ markdownAST }) {
           fs.mkdirSync(reportDir, { recursive: true });
         }
 
-        const filename = path.join(reportDir, `leak-report-${index}.heapsnapshot`);
+        const filename = path.join(reportDir, `leak-report-${globalIndex}.heapsnapshot`);
 
         console.log('Writing snapshot sync...');
-        v8.writeHeapSnapshot(filename);
-        console.log('Done!'); // This will only print AFTER the file is saved
+        await takeSnapshot(filename);
+        //console.log('Done!'); // This will only print AFTER the file is saved
+
+        if (globalIndex===5) {
+          throw new Error('finish!')
+        }
       }
+
+  globalIndex++;
     }
 
 
