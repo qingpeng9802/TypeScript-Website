@@ -6,6 +6,11 @@
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash"
   },
+  "features": {
+    "ghcr.io/devcontainers/features/sshd:1": {
+      "version": "latest"
+    }
+  },
 
   "forwardPorts": [8000],
 }
