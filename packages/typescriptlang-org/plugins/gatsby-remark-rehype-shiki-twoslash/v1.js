@@ -4,7 +4,7 @@ import { toHtml } from 'hast-util-to-html';
 import { unified } from 'unified';
 import rehypeShiki from '@shikijs/rehype';
 import { transformerTwoslash } from '@shikijs/twoslash'
-import { ModuleResolutionKind } from 'typescript'
+
 
 
 /**
@@ -27,7 +27,6 @@ const createprocessor = () => unified().use(rehypeShiki, {
       twoslashOptions: {
         compilerOptions: {
           skipLibCheck: true,
-          moduleResolution: ModuleResolutionKind.Node10
         }
       },
       cache: false
@@ -50,20 +49,21 @@ let globalLock = Promise.resolve();
 let globalIndex = 0;
 
 import pLimit from 'p-limit';
-
 const limit = pLimit(1);
 async function heavyTask(markdownAST) {
   /** @type {MdastCode[]} */
   const nodesToProcess = [];
   visit(markdownAST, 'code',
     /** @param {MdastCode} node */
-    core);
+    (node) => {
+      console.log('                    node=================')
+      nodesToProcess.push(node);
+    });
 
-  
-}
-
-const core = (node) => {
-        logMemory(`Before Node`);
+  await Promise.all(
+    nodesToProcess.map((node, index) =>
+      limit(async () => {
+        logMemory(`Before Node ${index}`);
         /** @type {HastRoot} */
         const hast = toHast(node);
 
@@ -74,42 +74,27 @@ const core = (node) => {
 
         /** @type {HastRoot} */
         const rootHast = { type: 'root', children: [hast] };
-        try {
-        const transformedHast = processor.runSync(rootHast);
+        const transformedHast = await processor.run(rootHast);
+
         node.type = 'html';
         node.value = toHtml(transformedHast);
 
-        } catch (e) {
-          logErrorToFile(e)
-
-        }
-
-        
         //global.gc();
-        logMemory(`After Node`);
-      }
+        logMemory(`After Node ${index}`);
+      })
+    )
+  );
+}
+
+
 
 async function applyTwoslash({ markdownAST }) {
   console.log('text++++')
 
   await heavyTask(markdownAST);
 
-}
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-// Replicate __dirname in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const logFilePath = path.join(__dirname, 'error.log');
-function logErrorToFile(error) {
-    // Append the message to 'error.log'
-    fs.appendFile(logFilePath, `${error.message}${error.stack}\n\n`, (err) => {
-        if (err) {
-            console.error('Failed to write to log file:', err);
-        }
-    });
+
 }
 
 export default applyTwoslash;
