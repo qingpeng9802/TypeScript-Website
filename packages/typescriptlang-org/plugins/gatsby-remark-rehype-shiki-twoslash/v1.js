@@ -1,5 +1,5 @@
 import { visit } from 'unist-util-visit';
-import { toHast } from 'mdast-util-to-hast';
+import { toHast, defaultHandlers } from 'mdast-util-to-hast';
 import { toHtml } from 'hast-util-to-html';
 import { unified } from 'unified';
 import rehypeShiki from '@shikijs/rehype';
@@ -14,6 +14,7 @@ import { transformerTwoslash } from '@shikijs/twoslash'
  * @typedef {import('hast').Root} HastRoot
  */
 
+//TODO RECHECK
 /** @return {import('unified').Processor<HastRoot, HastRoot, HastRoot, HastRoot, string>} */
 const createprocessor = () => unified().use(rehypeShiki, {
   themes: {
@@ -63,21 +64,20 @@ async function heavyTask(markdownAST) {
   await Promise.all(
     nodesToProcess.map((node, index) =>
       limit(async () => {
-        logMemory(`Before Node ${index}`);
+        logMemory(`Before Node ${index}`); // keep to check if need cache
         /** @type {HastRoot} */
-        const hast = toHast(node);
-
-        const codeElement = hast.children[0]
-        if (node.meta && codeElement) {
-          codeElement.data = { meta: node.meta };
-        }
+        const hast = toHast(node, {
+          allowDangerousHtml: true
+        }); // then has raw node
 
         /** @type {HastRoot} */
         const rootHast = { type: 'root', children: [hast] };
         const transformedHast = await processor.run(rootHast);
 
         node.type = 'html';
-        node.value = toHtml(transformedHast);
+        node.value = toHtml(transformedHast, {
+          allowDangerousHtml: true
+        });
 
         //global.gc();
         logMemory(`After Node ${index}`);
